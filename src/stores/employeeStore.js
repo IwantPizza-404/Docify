@@ -27,11 +27,11 @@ export const useEmployeeStore = defineStore('employee', {
   },
 
   actions: {
-    async fetchEmployees(page = 1, search = '') {
+    async fetchEmployees(page = 1, search = '', all=false) {
       try {
         this.loading = true
         this.error = null
-        const result = await fetchEmployees(page, search)
+        const result = await fetchEmployees(page, search, all)
         this.employees = result.data
         this.total = result.total
       } catch (error) {

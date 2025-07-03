@@ -14,7 +14,7 @@
             </v-col>
         </v-row>
 
-        <v-row v-else-if="employees.length === 0 && !loading && !error">
+        <v-row v-else-if="employees.length === 0 && !loading && !error && route.query.search">
             <v-col cols="12">
                 <v-alert type="info">No employees found.</v-alert>
             </v-col>
@@ -22,7 +22,7 @@
 
         <v-row v-else>
             <v-col v-for="employee in employees" :key="employee.id" cols="12" sm="6" md="4">
-                <v-card>
+                <v-card @click="$router.push(`/employees/${employee.id}`)">
                     <v-card-title>
                         {{ employee.firstName }} {{ employee.lastName }}
                     </v-card-title>
@@ -32,7 +32,7 @@
                     <v-card-text>
                         <div><strong>Birth Date:</strong> {{ employee.birthDate }}</div>
                         <div><strong>Passport:</strong> {{ employee.passport }}</div>
-                        <div>
+                        <div class="mt-2">
                             <v-chip :color="employee.active ? 'green' : 'red'" dark>
                                 {{ employee.active ? 'Active' : 'Inactive' }}
                             </v-chip>
@@ -62,11 +62,16 @@ const page = ref(Number(route.query.page) || 1)
 const employeeStore = useEmployeeStore()
 const { employees, total, loading, error } = storeToRefs(employeeStore)
 
+function fetchWithQuery() {
+    const search = route.query.search || ''
+    employeeStore.fetchEmployees(page.value, search)
+}
+
 watch(employees, (val) => { console.log('Employees updated:', val) })
 
 watch(page, (newPage) => {
     router.replace({ query: { ...route.query, page: newPage } })
-    employeeStore.fetchEmployees(newPage)
+    fetchWithQuery()
 })
 
 watch(
@@ -74,13 +79,24 @@ watch(
     (newPage) => {
         if (Number(newPage) !== page.value) {
             page.value = Number(newPage) || 1
-            employeeStore.fetchEmployees(page.value)
+            fetchWithQuery()
         }
     }
 )
 
+watch(
+    () => route.query.search,
+    () => {
+        if (page.value !== 1) {
+            page.value = 1
+            router.replace({ query: { ...route.query, page: 1 } })
+        }
+        fetchWithQuery()
+    }
+)
+
 onMounted(() => {
-    employeeStore.fetchEmployees(page.value)
+    fetchWithQuery()
 })
 </script>
 

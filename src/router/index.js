@@ -15,6 +15,21 @@ const router = createRouter({
       component: () => import('../views/EmployeesView.vue'),
     },
     {
+      path: '/employees/:id',
+      name: 'employee',
+      component: () => import('../views/EmployeeView.vue'),
+    },
+    {
+      path: '/documents',
+      name: 'documents',
+      component: () => import('../views/DocumentsView.vue'),
+    },
+    {
+      path: '/documents/:id',
+      name: 'document',
+      component: () => import('../views/DocumentView.vue'),
+    },
+    {
       path: '/:catchAll(.*)',
       component: () => import('../views/NotFound.vue'),
     },

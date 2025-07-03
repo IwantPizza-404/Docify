@@ -1,10 +1,21 @@
 <script setup>
 import { ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+
+const route = useRoute()
+const router = useRouter()
+const showSearch = ref(false)
+const searchText = ref('')
+
+function onSearch() {
+  router.replace({ name: route.name, query: { ...route.query, search: searchText.value } })
+}
 
 const drawer = ref(false)
 const items = ref([
   { title: 'Home', icon: 'mdi-home', route: '/' },
-  { title: 'Employees', icon: 'mdi-account-group', route: '/employees' }
+  { title: 'Employees', icon: 'mdi-account-group', route: '/employees' },
+  { title: 'Documents', icon: 'mdi-file', route: '/documents' }
 ])
 </script>
 
@@ -14,12 +25,12 @@ const items = ref([
       <v-app-bar color="primary">
         <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
 
-        <v-toolbar-title>{{ $route.name }}</v-toolbar-title>
+        <v-toolbar-title style="text-transform: capitalize;">{{ $route.name }}</v-toolbar-title>
 
-        <template v-if="$vuetify.display.mdAndUp">
-          <v-btn icon="mdi-magnify" variant="text"></v-btn>
-
-          <v-btn icon="mdi-filter" variant="text"></v-btn>
+        <template v-if="['employees'].includes(route.name)">
+          <v-text-field v-if="showSearch" v-model="searchText" placeholder="Search..." dense hide-details single-line
+            style="max-width: 200px; margin-right: 8px;" @keyup.enter="onSearch" @blur="onSearch" />
+          <v-btn icon="mdi-magnify" variant="text" @click="showSearch = !showSearch"></v-btn>
         </template>
 
         <v-btn icon="mdi-dots-vertical" variant="text"></v-btn>
